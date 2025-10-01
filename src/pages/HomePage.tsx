@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/common/Button';
-import { GameMode, Difficulty } from '../types';
+import { GameMode, Difficulty } from '../types/game';
 
 /**
  * 홈페이지 - 게임 모드 및 난이도 선택

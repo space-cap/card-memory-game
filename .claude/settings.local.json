@@ -7,7 +7,9 @@
       "Bash(mkdir:*)",
       "Bash(git log:*)",
       "Bash(npm install:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm run lint)",
+      "Bash(cat:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
