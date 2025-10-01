@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "superclaude": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "gemini-superclaude-mcp-server"],
+      "env": {}
+    }
+    
+    
+    
+  }
+}
