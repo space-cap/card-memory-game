@@ -119,12 +119,6 @@ const GamePage = () => {
         disabled={state.status !== GameStatus.PLAYING || state.revealedCards.length >= 2}
         gridCols={difficultyConfig.gridCols}
       />
-      {/* 디버깅 정보 */}
-      <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded text-sm">
-        <div>Status: {state.status}</div>
-        <div>Revealed: {state.revealedCards.length}</div>
-        <div>Disabled: {state.status !== GameStatus.PLAYING || state.revealedCards.length >= 2 ? 'YES' : 'NO'}</div>
-      </div>
 
       {/* 결과 모달 */}
       <GameResultModal

@@ -9,6 +9,7 @@ import { DeckCategory } from '../types/deck';
 // 임시로 이모지를 사용합니다
 const EMOJI_ANIMALS = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦'];
 const EMOJI_FOOD = ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🥑', '🥕', '🌽', '🥦'];
+const EMOJI_FACES = ['😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊', '😋', '😎', '😍', '😘', '🥰', '😗', '😙', '😚'];
 
 /**
  * 이모지를 data URL 이미지로 변환
@@ -52,6 +53,18 @@ export const DEFAULT_DECKS: Deck[] = [
     category: DeckCategory.FOOD,
     thumbnailUrl: emojiToDataUrl('🍎'),
     images: EMOJI_FOOD.map(emojiToDataUrl),
+    price: 0,
+    isPremium: false,
+    isOwned: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'deck-emoji',
+    name: '표정 이모지',
+    description: '다양한 표정의 이모지들',
+    category: DeckCategory.EMOJI,
+    thumbnailUrl: emojiToDataUrl('😀'),
+    images: EMOJI_FACES.map(emojiToDataUrl),
     price: 0,
     isPremium: false,
     isOwned: true,

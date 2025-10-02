@@ -60,6 +60,8 @@ const Card = ({ card, onClick, disabled = false }: CardProps) => {
             src={card.imageUrl}
             alt="Card"
             className="w-full h-full object-contain"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </div>

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/common/Button';
+import DeckSelector from '../components/home/DeckSelector';
 import { GameMode, Difficulty } from '../types/game';
+import { getOwnedDecks } from '../data/defaultDecks';
 
 /**
  * 홈페이지 - 게임 모드 및 난이도 선택
@@ -10,12 +12,15 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [selectedMode, setSelectedMode] = useState<GameMode>(GameMode.SINGLE);
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(Difficulty.EASY);
+  const [selectedDeckId, setSelectedDeckId] = useState<string>('deck-animals');
+
+  const ownedDecks = getOwnedDecks();
 
   const handleStartGame = () => {
     const params = new URLSearchParams({
       mode: selectedMode,
       difficulty: selectedDifficulty,
-      deckId: 'deck-animals', // 추후 덱 선택 기능 추가
+      deckId: selectedDeckId,
     });
     navigate(`/game?${params.toString()}`);
   };
@@ -72,6 +77,15 @@ const HomePage = () => {
               </p>
             </button>
           </div>
+        </section>
+
+        {/* 덱 선택 */}
+        <section className="bg-white rounded-2xl shadow-lg p-8">
+          <DeckSelector
+            decks={ownedDecks}
+            selectedDeckId={selectedDeckId}
+            onSelect={setSelectedDeckId}
+          />
         </section>
 
         {/* 난이도 선택 */}
