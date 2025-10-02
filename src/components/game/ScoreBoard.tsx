@@ -11,6 +11,10 @@ interface ScoreBoardProps {
  * 점수판 컴포넌트
  */
 const ScoreBoard = ({ players, currentPlayerId, mode }: ScoreBoardProps) => {
+  if (!players || players.length === 0) {
+    return null;
+  }
+
   if (mode === GameMode.SINGLE) {
     const player = players[0];
     return (

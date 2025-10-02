@@ -12,8 +12,12 @@ const HomePage = () => {
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(Difficulty.EASY);
 
   const handleStartGame = () => {
-    // 추후 게임 설정을 상태 관리로 전달
-    navigate('/game');
+    const params = new URLSearchParams({
+      mode: selectedMode,
+      difficulty: selectedDifficulty,
+      deckId: 'deck-animals', // 추후 덱 선택 기능 추가
+    });
+    navigate(`/game?${params.toString()}`);
   };
 
   return (

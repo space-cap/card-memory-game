@@ -61,10 +61,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case GameActionType.MATCH_CARDS: {
+      console.log('MATCH_CARDS reducer called, clearing revealedCards');
       const { cardIds } = action.payload;
+      if (!state.players || state.players.length === 0) {
+        console.warn('No players found, returning state');
+        return state;
+      }
+
       const currentPlayer = state.players.find((p) => p.id === state.currentPlayerId);
 
-      return {
+      const newState = {
         ...state,
         cards: state.cards.map((card) =>
           cardIds.includes(card.id) ? { ...card, state: CardState.MATCHED } : card
@@ -91,6 +97,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             : player
         ),
       };
+
+      console.log('MATCH_CARDS new revealedCards:', newState.revealedCards);
+      return newState;
     }
 
     case GameActionType.UNMATCH_CARDS: {
@@ -116,6 +125,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case GameActionType.END_GAME: {
       const { finalScore } = action.payload;
+      if (!state.players || state.players.length === 0) {
+        return { ...state, status: GameStatus.FINISHED };
+      }
+
       return {
         ...state,
         status: GameStatus.FINISHED,
@@ -137,6 +150,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case GameActionType.RESET_GAME: {
+      if (!state.players || state.players.length === 0) {
+        return {
+          ...state,
+          status: GameStatus.IDLE,
+          cards: state.cards.map((card) => ({ ...card, state: CardState.HIDDEN })),
+          revealedCards: [],
+          stats: {
+            moves: 0,
+            matches: 0,
+            timeElapsed: 0,
+            startTime: 0,
+          },
+        };
+      }
+
       return {
         ...state,
         status: GameStatus.IDLE,

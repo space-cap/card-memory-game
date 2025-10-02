@@ -29,6 +29,11 @@ const GameResultModal = ({
   onRestart,
   onExit,
 }: GameResultModalProps) => {
+  // Guard clause for invalid data
+  if (!players || players.length === 0) {
+    return null;
+  }
+
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -37,6 +42,7 @@ const GameResultModal = ({
 
   const renderSingleResult = () => {
     const player = players[0];
+    if (!player) return null;
     return (
       <div className="text-center">
         <div className="text-6xl mb-4">🎉</div>
@@ -84,6 +90,8 @@ const GameResultModal = ({
 
   const renderVersusResult = () => {
     const [player1, player2] = players;
+    if (!player1 || !player2) return null;
+
     const winner = player1.matches > player2.matches ? player1 : player2.matches > player1.matches ? player2 : null;
 
     return (

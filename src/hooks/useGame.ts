@@ -19,7 +19,7 @@ export function useGame() {
       const gameState = initializeGame(config, deckImages);
       dispatch({
         type: GameActionType.INIT_GAME,
-        payload: { config, cards: gameState.cards },
+        payload: gameState,
       });
     },
     [dispatch]
@@ -51,23 +51,39 @@ export function useGame() {
    */
   const flipCard = useCallback(
     (cardId: string) => {
-      if (!canFlipCard(state, cardId)) return;
+      // 현재 상태에서 뒤집기 가능한지 체크
+      if (!canFlipCard(state, cardId)) {
+        console.log('Cannot flip card:', cardId, 'state:', state.status, 'revealed:', state.revealedCards.length);
+        return;
+      }
 
-      dispatch({
-        type: GameActionType.FLIP_CARD,
-        payload: { cardId },
-      });
+      console.log('Flipping card:', cardId, 'currently revealed:', state.revealedCards);
 
-      // 2장째 뒤집었을 때 매칭 체크
-      const newRevealedCards = [...state.revealedCards, cardId];
-      if (newRevealedCards.length === 2) {
-        const [card1Id, card2Id] = newRevealedCards;
+      // 첫 번째 카드인 경우
+      if (state.revealedCards.length === 0) {
+        dispatch({
+          type: GameActionType.FLIP_CARD,
+          payload: { cardId },
+        });
+        return;
+      }
+
+      // 두 번째 카드인 경우
+      if (state.revealedCards.length === 1) {
+        dispatch({
+          type: GameActionType.FLIP_CARD,
+          payload: { cardId },
+        });
+
+        const card1Id = state.revealedCards[0];
+        const card2Id = cardId;
         const card1 = state.cards.find((c) => c.id === card1Id);
         const card2 = state.cards.find((c) => c.id === card2Id);
 
         if (card1 && card2) {
           setTimeout(() => {
             if (checkMatch(card1, card2)) {
+              console.log('Match successful!');
               // 매칭 성공
               dispatch({
                 type: GameActionType.MATCH_CARDS,
@@ -81,19 +97,22 @@ export function useGame() {
               const allMatched = updatedCards.every((c) => c.state === CardState.MATCHED);
 
               if (allMatched) {
-                const finalScore = calculateScore(
-                  state.stats.matches + 1,
-                  state.stats.moves + 1,
-                  state.stats.timeElapsed,
-                  state.config.difficulty
-                );
+                setTimeout(() => {
+                  const finalScore = calculateScore(
+                    state.stats.matches + 1,
+                    state.stats.moves + 1,
+                    state.stats.timeElapsed,
+                    state.config.difficulty
+                  );
 
-                dispatch({
-                  type: GameActionType.END_GAME,
-                  payload: { finalScore },
-                });
+                  dispatch({
+                    type: GameActionType.END_GAME,
+                    payload: { finalScore },
+                  });
+                }, 500);
               }
             } else {
+              console.log('Match failed!');
               // 매칭 실패
               dispatch({ type: GameActionType.UNMATCH_CARDS });
 
