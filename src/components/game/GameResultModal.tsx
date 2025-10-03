@@ -96,29 +96,63 @@ const GameResultModal = ({
 
     return (
       <div className="text-center">
-        <div className="text-6xl mb-4">
-          {winner ? '👑' : '🤝'}
+        {/* 승자 표시 */}
+        <div className="mb-6">
+          <div className="text-8xl mb-4 animate-bounce">
+            {winner ? '👑' : '🤝'}
+          </div>
+          <h2 className="text-4xl font-bold text-gray-800 mb-2">
+            {winner ? `${winner.name} 승리!` : '무승부!'}
+          </h2>
+          {winner && (
+            <p className="text-lg text-gray-600">
+              {winner.matches}개 매칭 성공!
+            </p>
+          )}
         </div>
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">
-          {winner ? `${winner.name} 승리!` : '무승부!'}
-        </h2>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {players.map((player) => (
-            <div
-              key={player.id}
-              className={`
-                p-6 rounded-xl
-                ${player.id === winner?.id ? 'bg-yellow-50 ring-2 ring-yellow-400' : 'bg-gray-50'}
-              `}
-            >
-              <div className="font-bold text-lg mb-3">{player.name}</div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">{player.score}</div>
-              <div className="text-sm text-gray-600">매칭: {player.matches}</div>
+        {/* 플레이어 결과 */}
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          {players.map((player) => {
+            const isWinner = player.id === winner?.id;
+            return (
+              <div
+                key={player.id}
+                className={`
+                  p-6 rounded-xl transition-all
+                  ${isWinner
+                    ? 'bg-gradient-to-br from-yellow-50 to-orange-50 ring-4 ring-yellow-400 scale-105'
+                    : 'bg-gray-50'}
+                `}
+              >
+                {isWinner && (
+                  <div className="text-3xl mb-2">🏆</div>
+                )}
+                <div className="font-bold text-xl mb-3">{player.name}</div>
+                <div className="text-5xl font-bold text-blue-600 mb-2">
+                  {player.matches}
+                </div>
+                <div className="text-sm text-gray-600">매칭 성공</div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 게임 통계 */}
+        <div className="bg-gray-50 rounded-xl p-4 mb-6">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <div className="text-gray-600">총 이동</div>
+              <div className="font-bold text-gray-800">{moves}회</div>
             </div>
-          ))}
+            <div>
+              <div className="text-gray-600">플레이 시간</div>
+              <div className="font-bold text-gray-800">{formatTime(timeElapsed)}</div>
+            </div>
+          </div>
         </div>
 
+        {/* 버튼 */}
         <div className="flex gap-3 justify-center">
           <Button onClick={onRestart} variant="primary" size="lg">
             🔄 다시하기

@@ -13,6 +13,7 @@ import GameControls from '../components/game/GameControls';
 import GameResultModal from '../components/game/GameResultModal';
 import MatchEffect from '../components/game/MatchEffect';
 import CelebrationEffect from '../components/game/CelebrationEffect';
+import TurnIndicator from '../components/game/TurnIndicator';
 import { calculateEarnedPoints } from '../services/scoreCalculator';
 import { saveGameRecord } from '../services/statisticsStorage';
 
@@ -119,6 +120,16 @@ const GamePage = () => {
           />
         </div>
       </div>
+
+      {/* 대전 모드 턴 표시 */}
+      {mode === GameMode.VERSUS && state.players.length > 0 && (
+        <div className="mb-6">
+          <TurnIndicator
+            currentPlayer={state.players.find((p) => p.id === state.currentPlayerId) || state.players[0]}
+            allPlayers={state.players}
+          />
+        </div>
+      )}
 
       {/* 게임 컨트롤 */}
       <div className="mb-6">

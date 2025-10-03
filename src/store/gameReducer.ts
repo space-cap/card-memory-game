@@ -85,7 +85,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             ? {
                 ...player,
                 matches: player.matches + 1,
-                score: currentPlayer
+                score: state.config.mode === 'versus'
+                  ? player.matches + 1 // 대전 모드는 매칭 개수만 점수로
+                  : currentPlayer
                   ? calculateScore(
                       player.matches + 1,
                       state.stats.moves,

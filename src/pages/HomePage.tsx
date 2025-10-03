@@ -62,18 +62,21 @@ const HomePage = () => {
               </p>
             </button>
 
-            {/* 대전 모드 (Phase 2에서 구현) */}
+            {/* 대전 모드 */}
             <button
               onClick={() => setSelectedMode(GameMode.VERSUS)}
-              disabled
-              className="p-6 rounded-xl border-2 border-gray-200 bg-gray-100 opacity-50 cursor-not-allowed"
+              className={`p-6 rounded-xl border-2 transition-all ${
+                selectedMode === GameMode.VERSUS
+                  ? 'border-blue-600 bg-blue-50 shadow-md'
+                  : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+              }`}
             >
               <div className="text-4xl mb-3">⚔️</div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">
                 대전 모드
               </h3>
               <p className="text-gray-600 text-sm">
-                곧 출시 예정!
+                친구와 함께 대결하세요
               </p>
             </button>
           </div>
