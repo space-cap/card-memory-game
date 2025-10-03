@@ -158,7 +158,15 @@ const HomePage = () => {
         </section>
 
         {/* 버튼 */}
-        <div className="flex justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Button
+            onClick={() => navigate('/deck-creator')}
+            variant="outline"
+            size="lg"
+            className="px-8 text-lg"
+          >
+            🎨 덱 만들기
+          </Button>
           <Button
             onClick={() => navigate('/statistics')}
             variant="secondary"

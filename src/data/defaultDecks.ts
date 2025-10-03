@@ -73,15 +73,47 @@ export const DEFAULT_DECKS: Deck[] = [
 ];
 
 /**
- * 덱 ID로 덱 가져오기
+ * 덱 ID로 덱 가져오기 (기본 덱 + 커스텀 덱)
  */
 export function getDeckById(deckId: string): Deck | undefined {
-  return DEFAULT_DECKS.find((deck) => deck.id === deckId);
+  // 먼저 기본 덱에서 찾기
+  const defaultDeck = DEFAULT_DECKS.find((deck) => deck.id === deckId);
+  if (defaultDeck) return defaultDeck;
+
+  // 커스텀 덱에서 찾기
+  if (typeof window !== 'undefined') {
+    try {
+      const customDecksData = localStorage.getItem('card-memory-game-custom-decks');
+      if (customDecksData) {
+        const customDecks = JSON.parse(customDecksData) as Deck[];
+        return customDecks.find((deck) => deck.id === deckId);
+      }
+    } catch (error) {
+      console.error('Failed to load custom deck:', error);
+    }
+  }
+
+  return undefined;
 }
 
 /**
- * 소유한 덱만 가져오기
+ * 소유한 덱만 가져오기 (기본 덱 + 커스텀 덱)
  */
 export function getOwnedDecks(): Deck[] {
-  return DEFAULT_DECKS.filter((deck) => deck.isOwned);
+  const ownedDecks = DEFAULT_DECKS.filter((deck) => deck.isOwned);
+
+  // 커스텀 덱 추가
+  if (typeof window !== 'undefined') {
+    try {
+      const customDecksData = localStorage.getItem('card-memory-game-custom-decks');
+      if (customDecksData) {
+        const customDecks = JSON.parse(customDecksData) as Deck[];
+        return [...ownedDecks, ...customDecks];
+      }
+    } catch (error) {
+      console.error('Failed to load custom decks:', error);
+    }
+  }
+
+  return ownedDecks;
 }
