@@ -154,8 +154,16 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* 시작 버튼 */}
-        <div className="flex justify-center">
+        {/* 버튼 */}
+        <div className="flex justify-center gap-4">
+          <Button
+            onClick={() => navigate('/statistics')}
+            variant="secondary"
+            size="lg"
+            className="px-8 text-lg"
+          >
+            📊 통계 보기
+          </Button>
           <Button
             onClick={handleStartGame}
             size="lg"

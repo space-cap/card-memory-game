@@ -12,6 +12,7 @@ import ScoreBoard from '../components/game/ScoreBoard';
 import GameControls from '../components/game/GameControls';
 import GameResultModal from '../components/game/GameResultModal';
 import { calculateEarnedPoints } from '../services/scoreCalculator';
+import { saveGameRecord } from '../services/statisticsStorage';
 
 /**
  * 게임 플레이 페이지
@@ -50,12 +51,23 @@ const GamePage = () => {
     startGame();
   }, [mode, difficulty, deckId, initGame, startGame, navigate]);
 
-  // 게임 종료 감지
+  // 게임 종료 감지 및 기록 저장
   useEffect(() => {
     if (state.status === GameStatus.FINISHED) {
+      // 게임 기록 저장
+      const isCompleted = state.cards.every((c) => c.state === 'matched');
+      saveGameRecord({
+        mode,
+        difficulty,
+        deckId,
+        score: state.players[0]?.score || 0,
+        moves: state.stats.moves,
+        timeElapsed: elapsed,
+        isCompleted,
+      });
       setShowResult(true);
     }
-  }, [state.status]);
+  }, [state.status, state.cards, state.players, state.stats.moves, mode, difficulty, deckId, elapsed]);
 
   const handleRestart = () => {
     setShowResult(false);
