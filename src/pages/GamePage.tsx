@@ -11,6 +11,8 @@ import MoveCounter from '../components/game/MoveCounter';
 import ScoreBoard from '../components/game/ScoreBoard';
 import GameControls from '../components/game/GameControls';
 import GameResultModal from '../components/game/GameResultModal';
+import MatchEffect from '../components/game/MatchEffect';
+import CelebrationEffect from '../components/game/CelebrationEffect';
 import { calculateEarnedPoints } from '../services/scoreCalculator';
 import { saveGameRecord } from '../services/statisticsStorage';
 
@@ -21,6 +23,7 @@ const GamePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showResult, setShowResult] = useState(false);
+  const [matchEffect, setMatchEffect] = useState<'success' | 'failure' | null>(null);
 
   const mode = (searchParams.get('mode') as GameMode) || GameMode.SINGLE;
   const difficulty = (searchParams.get('difficulty') as Difficulty) || Difficulty.EASY;
@@ -31,6 +34,12 @@ const GamePage = () => {
     state.status === GameStatus.PLAYING,
     updateTime
   );
+
+  const handleCardClick = (cardId: string) => {
+    flipCard(cardId, (isMatch) => {
+      setMatchEffect(isMatch ? 'success' : 'failure');
+    });
+  };
 
   // 게임 초기화
   useEffect(() => {
@@ -65,7 +74,15 @@ const GamePage = () => {
         timeElapsed: elapsed,
         isCompleted,
       });
-      setShowResult(true);
+
+      // 완료 시 축하 애니메이션 표시 후 결과 모달
+      if (isCompleted) {
+        setTimeout(() => {
+          setShowResult(true);
+        }, 2000); // 2초 후 결과 모달
+      } else {
+        setShowResult(true); // 시간 초과는 바로 모달
+      }
     }
   }, [state.status, state.cards, state.players, state.stats.moves, mode, difficulty, deckId, elapsed]);
 
@@ -127,9 +144,20 @@ const GamePage = () => {
       {/* 게임 보드 */}
       <GameBoard
         cards={state.cards}
-        onCardClick={flipCard}
+        onCardClick={handleCardClick}
         disabled={state.status !== GameStatus.PLAYING || state.revealedCards.length >= 2}
         gridCols={difficultyConfig.gridCols}
+      />
+
+      {/* 매칭 효과 */}
+      <MatchEffect
+        type={matchEffect}
+        onComplete={() => setMatchEffect(null)}
+      />
+
+      {/* 게임 완료 축하 애니메이션 */}
+      <CelebrationEffect
+        show={state.status === GameStatus.FINISHED && state.cards.every((c) => c.state === 'matched')}
       />
 
       {/* 결과 모달 */}

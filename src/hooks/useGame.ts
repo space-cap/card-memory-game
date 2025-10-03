@@ -50,7 +50,7 @@ export function useGame() {
    * 카드 뒤집기
    */
   const flipCard = useCallback(
-    (cardId: string) => {
+    (cardId: string, onMatchResult?: (isMatch: boolean) => void) => {
       // 현재 상태에서 뒤집기 가능한지 체크
       if (!canFlipCard(state, cardId)) {
         console.log('Cannot flip card:', cardId, 'state:', state.status, 'revealed:', state.revealedCards.length);
@@ -82,7 +82,12 @@ export function useGame() {
 
         if (card1 && card2) {
           setTimeout(() => {
-            if (checkMatch(card1, card2)) {
+            const isMatch = checkMatch(card1, card2);
+
+            // 매칭 결과 콜백 실행
+            onMatchResult?.(isMatch);
+
+            if (isMatch) {
               console.log('Match successful!');
               // 매칭 성공
               dispatch({
