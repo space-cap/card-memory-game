@@ -19,6 +19,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           matches: 0,
           timeElapsed: 0,
           startTime: 0,
+          // 타임 어택 모드인 경우 콤보 초기화
+          ...(action.payload.config.mode === 'time_attack' && {
+            combo: {
+              count: 0,
+              multiplier: 1,
+              lastMatchTime: 0,
+              maxCombo: 0,
+            },
+            timeBonus: 0,
+          }),
         },
       };
 
@@ -151,6 +161,32 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case GameActionType.UPDATE_COMBO: {
+      const { combo } = action.payload;
+      return {
+        ...state,
+        stats: {
+          ...state.stats,
+          combo,
+        },
+      };
+    }
+
+    case GameActionType.RESET_COMBO: {
+      if (!state.stats.combo) return state;
+      return {
+        ...state,
+        stats: {
+          ...state.stats,
+          combo: {
+            ...state.stats.combo,
+            count: 0,
+            multiplier: 1,
+          },
+        },
+      };
+    }
+
     case GameActionType.RESET_GAME: {
       if (!state.players || state.players.length === 0) {
         return {
@@ -163,6 +199,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             matches: 0,
             timeElapsed: 0,
             startTime: 0,
+            ...(state.config.mode === 'time_attack' && {
+              combo: {
+                count: 0,
+                multiplier: 1,
+                lastMatchTime: 0,
+                maxCombo: 0,
+              },
+              timeBonus: 0,
+            }),
           },
         };
       }
@@ -178,6 +223,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           matches: 0,
           timeElapsed: 0,
           startTime: 0,
+          ...(state.config.mode === 'time_attack' && {
+            combo: {
+              count: 0,
+              multiplier: 1,
+              lastMatchTime: 0,
+              maxCombo: 0,
+            },
+            timeBonus: 0,
+          }),
         },
       };
     }

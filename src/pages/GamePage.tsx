@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGame } from '../hooks/useGame';
 import { useTimer } from '../hooks/useTimer';
 import type { GameConfig } from '../types/game';
-import { GameMode, Difficulty, GameStatus, DIFFICULTY_CONFIG } from '../types/game';
+import { GameMode, Difficulty, GameStatus, DIFFICULTY_CONFIG, TIME_ATTACK_CONFIG } from '../types/game';
 import { getDeckById } from '../data/defaultDecks';
 import GameBoard from '../components/game/GameBoard';
 import Timer from '../components/game/Timer';
@@ -14,6 +14,8 @@ import GameResultModal from '../components/game/GameResultModal';
 import MatchEffect from '../components/game/MatchEffect';
 import CelebrationEffect from '../components/game/CelebrationEffect';
 import TurnIndicator from '../components/game/TurnIndicator';
+import { ComboIndicator } from '../components/game/ComboIndicator';
+import { TimeAttackTimer } from '../components/game/TimeAttackTimer';
 import { calculateEarnedPoints } from '../services/scoreCalculator';
 import { saveGameRecord } from '../services/statisticsStorage';
 
@@ -54,7 +56,9 @@ const GamePage = () => {
       mode,
       difficulty,
       deckId,
-      timeLimit: DIFFICULTY_CONFIG[difficulty].timeLimit,
+      timeLimit: mode === GameMode.TIME_ATTACK
+        ? TIME_ATTACK_CONFIG[difficulty].timeLimit
+        : DIFFICULTY_CONFIG[difficulty].timeLimit,
     };
 
     initGame(config, deck.images);
@@ -98,7 +102,11 @@ const GamePage = () => {
     navigate('/');
   }, [navigate]);
 
-  const difficultyConfig = useMemo(() => DIFFICULTY_CONFIG[difficulty], [difficulty]);
+  const difficultyConfig = useMemo(() =>
+    mode === GameMode.TIME_ATTACK
+      ? TIME_ATTACK_CONFIG[difficulty]
+      : DIFFICULTY_CONFIG[difficulty]
+  , [mode, difficulty]);
 
   const pointsEarned = useMemo(() =>
     state.status === GameStatus.FINISHED
@@ -106,15 +114,29 @@ const GamePage = () => {
       : undefined
   , [state.status, state.players, difficulty]);
 
+  // 타임 어택 모드: 남은 시간 계산
+  const timeRemaining = useMemo(() => {
+    if (mode !== GameMode.TIME_ATTACK || !difficultyConfig.timeLimit) return 0;
+    return Math.max(0, difficultyConfig.timeLimit - elapsed);
+  }, [mode, difficultyConfig.timeLimit, elapsed]);
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* 게임 헤더 */}
       <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
         <div className="flex flex-wrap justify-between items-center gap-4">
-          <Timer
-            timeElapsed={elapsed}
-            timeLimit={difficultyConfig.timeLimit}
-          />
+          {/* 타임 어택 모드는 전용 타이머 사용 */}
+          {mode === GameMode.TIME_ATTACK ? (
+            <TimeAttackTimer
+              timeRemaining={timeRemaining}
+              timeLimit={difficultyConfig.timeLimit || 0}
+            />
+          ) : (
+            <Timer
+              timeElapsed={elapsed}
+              timeLimit={difficultyConfig.timeLimit}
+            />
+          )}
           <MoveCounter moves={state.stats.moves} />
           <ScoreBoard
             players={state.players}
@@ -123,6 +145,13 @@ const GamePage = () => {
           />
         </div>
       </div>
+
+      {/* 타임 어택 모드 콤보 표시 */}
+      {mode === GameMode.TIME_ATTACK && state.stats.combo && state.stats.combo.count > 0 && (
+        <div className="mb-6">
+          <ComboIndicator combo={state.stats.combo} />
+        </div>
+      )}
 
       {/* 대전 모드 턴 표시 */}
       {mode === GameMode.VERSUS && state.players.length > 0 && (

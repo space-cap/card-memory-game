@@ -43,7 +43,7 @@ const HomePage = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
             🎮 게임 모드
           </h2>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* 싱글 모드 */}
             <button
               onClick={() => setSelectedMode(GameMode.SINGLE)}
@@ -77,6 +77,38 @@ const HomePage = () => {
               </h3>
               <p className="text-gray-600 text-sm">
                 친구와 함께 대결하세요
+              </p>
+            </button>
+
+            {/* 타임 어택 모드 */}
+            <button
+              onClick={() => setSelectedMode(GameMode.TIME_ATTACK)}
+              className={`p-6 rounded-xl border-2 transition-all ${
+                selectedMode === GameMode.TIME_ATTACK
+                  ? 'border-purple-600 bg-purple-50 shadow-md'
+                  : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
+              }`}
+            >
+              <div className="text-4xl mb-3">⏱️</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                타임 어택
+              </h3>
+              <p className="text-gray-600 text-sm">
+                시간과의 싸움! 콤보로 고득점
+              </p>
+            </button>
+
+            {/* 챌린지 모드 (준비중) */}
+            <button
+              disabled
+              className="p-6 rounded-xl border-2 border-gray-200 bg-gray-100 opacity-50 cursor-not-allowed"
+            >
+              <div className="text-4xl mb-3">🏆</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                챌린지
+              </h3>
+              <p className="text-gray-600 text-sm">
+                준비중...
               </p>
             </button>
           </div>

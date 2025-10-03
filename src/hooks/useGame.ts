@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useGameContext } from '../store';
-import type { GameConfig } from '../types/game';
-import { GameActionType, CardState } from '../types/game';
+import type { GameConfig, ComboState } from '../types/game';
+import { GameActionType, CardState, TIME_ATTACK_CONFIG } from '../types/game';
 import { initializeGame, canFlipCard, checkMatch, isGameOver, isTimeUp } from '../services/gameEngine';
 import { calculateScore } from '../services/scoreCalculator';
 
@@ -89,6 +89,47 @@ export function useGame() {
 
             if (isMatch) {
               console.log('Match successful!');
+
+              // 타임 어택 모드: 콤보 업데이트
+              if (state.config.mode === 'time_attack' && state.stats.combo) {
+                const currentTime = Date.now();
+                const timeSinceLastMatch = state.stats.combo.lastMatchTime
+                  ? (currentTime - state.stats.combo.lastMatchTime) / 1000
+                  : 999;
+
+                const comboWindow = TIME_ATTACK_CONFIG[state.config.difficulty].comboWindow;
+
+                // 콤보 윈도우 안에 매칭하면 콤보 증가
+                if (timeSinceLastMatch <= comboWindow) {
+                  const newComboCount = state.stats.combo.count + 1;
+                  const newMultiplier = Math.min(Math.floor(newComboCount / 3) + 1, 5); // 최대 5배
+                  const newCombo: ComboState = {
+                    count: newComboCount,
+                    multiplier: newMultiplier,
+                    lastMatchTime: currentTime,
+                    maxCombo: Math.max(state.stats.combo.maxCombo, newComboCount),
+                  };
+
+                  dispatch({
+                    type: GameActionType.UPDATE_COMBO,
+                    payload: { combo: newCombo },
+                  });
+                } else {
+                  // 콤보 윈도우 초과: 콤보 리셋하고 1부터 시작
+                  const resetCombo: ComboState = {
+                    count: 1,
+                    multiplier: 1,
+                    lastMatchTime: currentTime,
+                    maxCombo: state.stats.combo.maxCombo,
+                  };
+
+                  dispatch({
+                    type: GameActionType.UPDATE_COMBO,
+                    payload: { combo: resetCombo },
+                  });
+                }
+              }
+
               // 매칭 성공
               dispatch({
                 type: GameActionType.MATCH_CARDS,
@@ -118,6 +159,12 @@ export function useGame() {
               }
             } else {
               console.log('Match failed!');
+
+              // 타임 어택 모드: 콤보 리셋
+              if (state.config.mode === 'time_attack' && state.stats.combo) {
+                dispatch({ type: GameActionType.RESET_COMBO });
+              }
+
               // 매칭 실패
               dispatch({ type: GameActionType.UNMATCH_CARDS });
 
