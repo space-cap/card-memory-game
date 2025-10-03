@@ -1,3 +1,4 @@
+import { memo, useCallback } from 'react';
 import type { Card as CardType } from '../../types/game';
 import { CardState } from '../../types/game';
 
@@ -8,17 +9,17 @@ interface CardProps {
 }
 
 /**
- * 카드 컴포넌트
+ * 카드 컴포넌트 (React.memo로 최적화)
  */
-const Card = ({ card, onClick, disabled = false }: CardProps) => {
+const Card = memo(({ card, onClick, disabled = false }: CardProps) => {
   const isRevealed = card.state === CardState.REVEALED || card.state === CardState.MATCHED;
   const isMatched = card.state === CardState.MATCHED;
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (!disabled && card.state === CardState.HIDDEN) {
       onClick(card.id);
     }
-  };
+  }, [disabled, card.state, card.id, onClick]);
 
   return (
     <div
@@ -77,6 +78,8 @@ const Card = ({ card, onClick, disabled = false }: CardProps) => {
       </div>
     </div>
   );
-};
+});
+
+Card.displayName = 'Card';
 
 export default Card;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGame } from '../hooks/useGame';
 import { useTimer } from '../hooks/useTimer';
@@ -36,11 +36,11 @@ const GamePage = () => {
     updateTime
   );
 
-  const handleCardClick = (cardId: string) => {
+  const handleCardClick = useCallback((cardId: string) => {
     flipCard(cardId, (isMatch) => {
       setMatchEffect(isMatch ? 'success' : 'failure');
     });
-  };
+  }, [flipCard]);
 
   // 게임 초기화
   useEffect(() => {
@@ -87,21 +87,24 @@ const GamePage = () => {
     }
   }, [state.status, state.cards, state.players, state.stats.moves, mode, difficulty, deckId, elapsed]);
 
-  const handleRestart = () => {
+  const handleRestart = useCallback(() => {
     setShowResult(false);
     resetGame();
     resetTimer();
     startGame();
-  };
+  }, [resetGame, resetTimer, startGame]);
 
-  const handleExit = () => {
+  const handleExit = useCallback(() => {
     navigate('/');
-  };
+  }, [navigate]);
 
-  const difficultyConfig = DIFFICULTY_CONFIG[difficulty];
-  const pointsEarned = state.status === GameStatus.FINISHED
-    ? calculateEarnedPoints(state.players[0]?.score || 0, difficulty)
-    : undefined;
+  const difficultyConfig = useMemo(() => DIFFICULTY_CONFIG[difficulty], [difficulty]);
+
+  const pointsEarned = useMemo(() =>
+    state.status === GameStatus.FINISHED
+      ? calculateEarnedPoints(state.players[0]?.score || 0, difficulty)
+      : undefined
+  , [state.status, state.players, difficulty]);
 
   return (
     <div className="container mx-auto px-4 py-8">
